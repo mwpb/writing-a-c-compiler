@@ -1,3 +1,4 @@
+mod tokens;
 use clap::Parser;
 use std::{fs::remove_file, path::Path, process::Command};
 
