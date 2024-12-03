@@ -1,6 +1,6 @@
 mod tokens;
 use clap::Parser;
-use std::{fs::remove_file, path::Path, process::Command};
+use std::{fs, path::Path, process::Command};
 
 #[derive(Parser, Debug)]
 struct CliArgs {
@@ -28,11 +28,9 @@ fn preprocess(source_path: &Path, preprocessed_file: &Path) -> anyhow::Result<()
 }
 
 fn compile(preprocessed_path: &Path, assembly_path: &Path) -> anyhow::Result<()> {
-    let mock_path = assembly_path.with_extension("bak");
-    Command::new("cp")
-        .arg(mock_path.as_os_str())
-        .arg(assembly_path.as_os_str())
-        .output()?;
+    let programme = fs::read_to_string(preprocessed_path)?;
+    let tokens = tokens::tokenize(&programme)?;
+    fs::write(assembly_path, programme)?;
     Ok(())
 }
 
@@ -54,9 +52,9 @@ fn main() -> anyhow::Result<()> {
 
     preprocess(source_path, &preprocessed_path)?;
     compile(&preprocessed_path, &assembly_path)?;
-    remove_file(preprocessed_path)?;
+    fs::remove_file(preprocessed_path)?;
     assemble_and_link(&assembly_path, &executable_path)?;
-    remove_file(assembly_path)?;
+    fs::remove_file(assembly_path)?;
 
     Ok(())
 }
