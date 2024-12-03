@@ -2,14 +2,14 @@ use anyhow::{anyhow, Context};
 use regex::Regex;
 
 #[derive(Debug, PartialEq, Eq)]
-enum Keyword {
+pub enum Keyword {
     INT,
     VOID,
     RETURN,
 }
 
 #[derive(Debug, PartialEq, Eq)]
-enum Token<'a> {
+pub enum Token<'a> {
     Identifier(&'a str),
     Constant(i32),
     Keyword(Keyword),
@@ -107,7 +107,7 @@ fn tokenize_programme<'a>(programme: &'a mut Programme) -> anyhow::Result<()> {
     Err(anyhow!("Token not recognised.",))
 }
 
-fn tokenize(text: &str) -> anyhow::Result<Vec<Token>> {
+pub fn tokenize(text: &str) -> anyhow::Result<Vec<Token>> {
     let mut programme = Programme {
         text,
         tokens: vec![],
@@ -133,5 +133,12 @@ mod tests {
                 Token::CloseParen
             ]
         )
+    }
+
+    #[test]
+    fn test_unrecognised_token() {
+        let raw_text = "int %main()";
+        let tokens = tokenize(raw_text);
+        assert!(tokens.is_err())
     }
 }
