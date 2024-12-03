@@ -104,7 +104,10 @@ fn tokenize_programme<'a>(programme: &'a mut Programme) -> anyhow::Result<()> {
         }
     }
 
-    Err(anyhow!("Token not recognised.",))
+    Err(anyhow!(
+        "Token not recognised {:?}.",
+        programme.text[0..20].to_string()
+    ))
 }
 
 pub fn tokenize(text: &str) -> anyhow::Result<Vec<Token>> {
@@ -122,7 +125,9 @@ mod tests {
 
     #[test]
     fn test_tokenize() {
-        let raw_text = "int main()";
+        let raw_text = "int main(void) {
+  return 2;
+}";
         let tokens = tokenize(raw_text).unwrap();
         assert_eq!(
             tokens,
@@ -130,7 +135,13 @@ mod tests {
                 Token::Keyword(Keyword::INT),
                 Token::Identifier("main"),
                 Token::OpenParen,
-                Token::CloseParen
+                Token::Keyword(Keyword::VOID),
+                Token::CloseParen,
+                Token::OpenBrace,
+                Token::Keyword(Keyword::RETURN),
+                Token::Constant(2),
+                Token::Semicolon,
+                Token::CloseBrace
             ]
         )
     }
