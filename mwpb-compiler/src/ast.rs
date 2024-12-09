@@ -79,7 +79,7 @@ pub fn parse_programme<'a>(tokens: &'a [Token]) -> anyhow::Result<Programme<'a>>
     let (function, tokens) = parse_function(tokens)?;
     if tokens.len() > 0 {
         return Err(anyhow!(
-            "Programme finished but the are remaining tokens {:?}.",
+            "Programme finished but there are remaining tokens {:?}.",
             tokens
         ));
     }
