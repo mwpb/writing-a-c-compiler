@@ -1,8 +1,6 @@
-use std::{any, array::from_ref, ops::Deref};
-
 use anyhow::anyhow;
 
-use crate::tokens::{self, Keyword, Token};
+use crate::tokens::{Keyword, Token};
 
 type Identifier<'a> = &'a str;
 enum Expression {
@@ -85,6 +83,6 @@ pub fn parse_programme<'a>(tokens: &'a [Token]) -> anyhow::Result<Programme<'a>>
             tokens
         ));
     }
-    
+
     Ok(Programme { function })
 }
