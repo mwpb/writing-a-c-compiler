@@ -1,5 +1,6 @@
 mod ast;
 mod tokens;
+use ast::Node;
 use clap::Parser;
 use std::{fs, path::Path, process::Command};
 
@@ -31,7 +32,7 @@ fn preprocess(source_path: &Path, preprocessed_file: &Path) -> anyhow::Result<()
 fn compile(preprocessed_path: &Path, assembly_path: &Path) -> anyhow::Result<()> {
     let programme = fs::read_to_string(preprocessed_path)?;
     let tokens = tokens::tokenize(&programme)?;
-    let _ast = ast::parse_programme(&*tokens)?;
+    let _ast = ast::Programme::parse(&*tokens)?;
     fs::write(assembly_path, programme)?;
     Ok(())
 }
