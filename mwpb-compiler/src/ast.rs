@@ -3,25 +3,25 @@ use anyhow::anyhow;
 use crate::tokens::{Keyword, Token};
 
 #[derive(Debug)]
-enum Identifier {
+pub enum Identifier {
     Var(String),
 }
 #[derive(Debug)]
-enum Expression {
+pub enum Expression {
     Constant(i32),
 }
 #[derive(Debug)]
-enum Statement {
+pub enum Statement {
     Return(Expression),
 }
 #[derive(Debug)]
-struct Function {
-    name: Identifier,
-    body: Statement,
+pub struct Function {
+    pub name: Identifier,
+    pub body: Statement,
 }
 #[derive(Debug)]
 pub struct Programme {
-    function: Function,
+    pub function: Function,
 }
 
 fn expect<'a>(expected: &[Token], mut tokens: &'a [Token<'a>]) -> anyhow::Result<&'a [Token<'a>]> {
