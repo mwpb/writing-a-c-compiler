@@ -26,6 +26,7 @@ pub struct Programme {
 fn generate_operand(expression: ast::Expression) -> Operand {
     match expression {
         Expression::Constant(i) => Operand::Imm(i),
+        Expression::Unary(_) => todo!(),
     }
 }
 

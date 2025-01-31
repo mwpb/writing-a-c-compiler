@@ -18,7 +18,7 @@ pub enum Token<'a> {
     OpenBrace,
     CloseBrace,
     Semicolon,
-    BitwiseComplement,
+    Complement,
     Negation,
     Decrement,
 }
@@ -52,7 +52,7 @@ fn token_extractors() -> anyhow::Result<Vec<TokenExtractor>> {
         },
         TokenExtractor {
             regex: Regex::new(r"^~")?,
-            token_from_text: |_| Ok(Token::BitwiseComplement),
+            token_from_text: |_| Ok(Token::Complement),
         },
         TokenExtractor {
             regex: Regex::new(r"^--")?,

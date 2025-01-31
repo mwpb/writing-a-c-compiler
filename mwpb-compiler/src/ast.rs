@@ -1,14 +1,25 @@
 use anyhow::anyhow;
 
-use crate::tokens::{Keyword, Token};
+use crate::tokens::{self, Keyword, Token};
 
 #[derive(Debug)]
 pub enum Identifier {
     Var(String),
 }
 #[derive(Debug)]
+pub enum UnaryOperator {
+    Complement,
+    Negate,
+}
+#[derive(Debug)]
+pub struct Unary {
+    operator: UnaryOperator,
+    expression: Expression,
+}
+#[derive(Debug)]
 pub enum Expression {
     Constant(i32),
+    Unary(Box<Unary>),
 }
 #[derive(Debug)]
 pub enum Statement {
@@ -34,8 +45,30 @@ fn expect<'a>(expected: &[Token], mut tokens: &'a [Token<'a>]) -> anyhow::Result
     Ok(tokens)
 }
 
+fn parse_matching_braces<'a>(tokens: &'a [Token]) -> anyhow::Result<(Expression, &'a [Token<'a>])> {
+    let tokens = expect(&[Token::OpenParen], tokens)?;
+    let (expression, tokens) = parse_expression(tokens)?;
+    let tokens = expect(&[Token::CloseParen], tokens)?;
+    Ok((expression, tokens))
+}
+
+fn parse_unary<'a>(
+    operator: UnaryOperator,
+    tokens: &'a [Token],
+) -> anyhow::Result<(Expression, &'a [Token<'a>])> {
+    Ok((
+        Expression::Unary(Box::new(Unary {
+            operator,
+            expression: parse_expression(tokens)?.0,
+        })),
+        parse_expression(tokens)?.1,
+    ))
+}
 fn parse_expression<'a>(tokens: &'a [Token]) -> anyhow::Result<(Expression, &'a [Token<'a>])> {
     match tokens {
+        [Token::Complement, tokens @ ..] => parse_unary(UnaryOperator::Complement, tokens),
+        [Token::Negation, tokens @ ..] => parse_unary(UnaryOperator::Negate, tokens),
+        [Token::OpenParen, ..] => parse_matching_braces(tokens),
         [Token::Constant(a), tokens @ ..] => Ok((Expression::Constant(*a), tokens)),
         _ => Err(anyhow!(
             "Token {:?} is not a constant. {:?}",
