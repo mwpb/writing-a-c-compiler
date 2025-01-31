@@ -18,13 +18,16 @@ pub enum Token<'a> {
     OpenBrace,
     CloseBrace,
     Semicolon,
+    BitwiseComplement,
+    Negation,
+    Decrement,
 }
 
 struct TokenExtractor {
     regex: Regex,
     token_from_text: fn(&str) -> anyhow::Result<Token>,
 }
-
+#[derive(Debug)]
 struct Programme<'a> {
     text: &'a str,
     tokens: Vec<Token<'a>>,
@@ -46,6 +49,18 @@ fn token_extractors() -> anyhow::Result<Vec<TokenExtractor>> {
         TokenExtractor {
             regex: Regex::new(r"^\}")?,
             token_from_text: |_| Ok(Token::CloseBrace),
+        },
+        TokenExtractor {
+            regex: Regex::new(r"^~")?,
+            token_from_text: |_| Ok(Token::BitwiseComplement),
+        },
+        TokenExtractor {
+            regex: Regex::new(r"^--")?,
+            token_from_text: |_| Ok(Token::Decrement),
+        },
+        TokenExtractor {
+            regex: Regex::new(r"^-")?,
+            token_from_text: |_| Ok(Token::Negation),
         },
         TokenExtractor {
             regex: Regex::new(r"^;")?,
@@ -92,6 +107,7 @@ fn extract_token(extractor: TokenExtractor, programme: &mut Programme) -> anyhow
 }
 
 fn tokenize_programme<'a>(programme: &'a mut Programme) -> anyhow::Result<()> {
+    // println!("{:?}", programme);
     programme.text = programme.text.trim();
     if programme.text.is_empty() {
         return Ok(());
@@ -106,7 +122,7 @@ fn tokenize_programme<'a>(programme: &'a mut Programme) -> anyhow::Result<()> {
 
     Err(anyhow!(
         "Token not recognised {:?}.",
-        programme.text[0..20].to_string()
+        programme.text.to_string()
     ))
 }
 
